@@ -218,12 +218,12 @@ class Tab2(ttk.Frame, GuiApplication):
                     cb.grid(row=row, column=col)
 
         # 「全選択」ボタンを設置
-        slc_all_btn = functools.partial(self.check_all_checkeboxes, frame2_tab2, rows, cols)
-        all_check_button = Button(frame2_tab2, text='全選択', command=slc_all_btn, overrelief='groove')
+        select_all_button = functools.partial(self.check_all_checkeboxes, frame2_tab2, rows, cols)
+        all_check_button = Button(frame2_tab2, text='全選択', command=select_all_button, overrelief='groove')
         all_check_button.grid(row=rows, column=3)
 
-        unslc_all_btn = functools.partial(self.clear_all_checkeboxes, frame2_tab2, rows, cols)
-        all_check_button = Button(frame2_tab2, text='全解除', command=unslc_all_btn, overrelief='groove')
+        unselect_all_button = functools.partial(self.clear_all_checkeboxes, frame2_tab2, rows, cols)
+        all_check_button = Button(frame2_tab2, text='全解除', command=unselect_all_button, overrelief='groove')
         all_check_button.grid(row=rows, column=4)
     # ========================================================================================================
         # Tab2のFrame3の作成
@@ -354,5 +354,5 @@ if __name__ == "__main__":
 # spec
 # a.datas += [("icon.txt", ".//icon.txt", "DATA")]
 # app = BUNDLE(exe,
-            #  name='Main.app',
-            # info_plist={ 'NSHighResolutionCapable': 'True'})
+#              name='Main.app',
+#             info_plist={ 'NSHighResolutionCapable': 'True'})
