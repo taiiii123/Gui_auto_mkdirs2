@@ -1,6 +1,7 @@
 import copy
 import functools
 import os
+import re
 import sys
 
 from tkinter import *
@@ -35,6 +36,7 @@ class GuiApplication(ttk.Notebook):
     def dirdialog_clicked(self, entry):
         iDir = os.path.abspath(os.path.dirname(sys.argv[0]))
         iDir_path = filedialog.askdirectory(initialdir=iDir)
+        print(iDir_path)
         entry.set(iDir_path)
 
 
@@ -62,8 +64,8 @@ class Tab1(ttk.Frame, GuiApplication):
         # 「フォルダ参照」ボタンの作成
         dir_button = ttk.Button(frame1_tab1, text='参照', command=lambda :super(Tab1, self).dirdialog_clicked(self.entry1_tag1))
         dir_button.pack(side=LEFT)
-    # ========================================================================================================
 
+    # ========================================================================================================
         # Tab1のFrame2の作成
         frame2_tab1 = ttk.Frame(master, padding=10, style='Tab1.TFrame')
         frame2_tab1.grid(row=2, column=1, padx=20, sticky=E)
@@ -98,6 +100,7 @@ class Tab1(ttk.Frame, GuiApplication):
         self.co = ttk.Combobox(frame2_tab1, state="readonly", values=nums_kind, width=12)
         self.co.set(nums_kind[0])
         self.co.pack(side=LEFT, padx=(2, 10))
+
     # ========================================================================================================
         # Tab1のFrame3の作成
         frame3_tab1 = ttk.Frame(master, padding=10, style='Tab1.TFrame')
@@ -110,28 +113,37 @@ class Tab1(ttk.Frame, GuiApplication):
         # キャンセルボタンの設置
         cancel_button = ttk.Button(frame3_tab1, text=('閉じる'), command=master.quit)
         cancel_button.pack(fill='x', padx=75, side='right')
-    # ========================================================================================================
 
+    # ========================================================================================================
     # タブ1の「作成」ボタン押下時処理
     def clicked_mkdir1(self):
         dir_path = self.entry1_tag1.get()
         input_dirName = self.entry2_tag1.get()
         input_dirCount = self.entry3_tag1.get()
 
-        if not dir_path and not input_dirName and not input_dirCount:
+        # ドライブ(例 c:/, D:/)のパスを見つける
+        match_head_path = re.search(r'^[A-Z]:/', dir_path)
+
+        # パスの判定処理
+        if (dir_path, input_dirName, input_dirCount) == (False, False, False):
             messagebox.showerror('エラー', '何も入力されていません')
             return
         if not dir_path:
             messagebox.showerror('エラー', 'パスの指定がありません')
             return
+        elif not match_head_path:
+            messagebox.showerror('エラー', '正しいパスを入力してください!')
+            return
+
+        # フォルダ作成処理
         try:
             msg = messagebox.askyesno(
                 '確認', 
-                '作成先のパスはあっていますか?\n' +
-                '--------------------------------\n' +
-                '{}\n'.format(dir_path) + 
-                '--------------------------------\n' +
-                '作成しますがよろしいですか?')
+                '作成先のパスはあっていますか?\n' 
+                + '-------------------------------------------------------------------------------\n' 
+                + '{}\n'.format(dir_path) 
+                + '-------------------------------------------------------------------------------\n' 
+                + '作成しますがよろしいですか?')
             if msg == True:
                 if int(input_dirCount) > 100:
                     messagebox.showwarning('警告', '最大、100個までのフォルダを作成することが可能です')
@@ -152,10 +164,14 @@ class Tab1(ttk.Frame, GuiApplication):
                 else:
                     return
                 messagebox.showinfo('フォルダ作成情報', '{}個のフォルダが作成されました!'.format(input_dirCount))
+                return
         except ValueError:
             messagebox.showerror('エラー', '半角英数字で番号を入力してください')
+            return
         except Exception as e:
-            print(e)
+            print('エラー :',e)
+            messagebox.showerror('エラー', '予期しないエラーが発生しました')
+            return
 
 
 
@@ -171,7 +187,7 @@ class Tab2(ttk.Frame, GuiApplication):
                             "鳥取県", "島根県", "岡山県", "広島県", "山口県", "徳島県", "香川県", "愛媛県", "高知県", "福岡県",
                             "佐賀県", "長崎県", "熊本県", "大分県", "宮崎県", "鹿児島県", "沖縄県")
 
-        # チェックされたときに変更するリスト(リスト内:全てFalse)
+        #  チェックされたときに変更するリスト(リスト内:全てFalse)
         self.check_todoufuken = [False for fal in range(len(self.TODOUFUKEN))]
 
         # チェックボックスで選択された都道府県名を格納するリスト
@@ -181,6 +197,7 @@ class Tab2(ttk.Frame, GuiApplication):
         style.configure('Tab2.TFrame', foreground='black', background='white')
         style.configure('Tab2_OFF_Check.TCheckbutton', foreground='#000000', background='white')
         style.configure('Tab2_ON_Check.TCheckbutton', foreground='#0F1FFF', background='white')
+
     # ========================================================================================================
         # Tab2のFrame1の作成
         frame1_tab2 = ttk.Frame(master, padding=10, relief='groove', style='Tab2.TFrame')
@@ -198,6 +215,7 @@ class Tab2(ttk.Frame, GuiApplication):
         # 「フォルダ参照」ボタンの作成
         dir_button = ttk.Button(frame1_tab2, text='参照', command=lambda :super(Tab2, self).dirdialog_clicked(entry1_tag2))
         dir_button.pack(side=LEFT)
+
     # ========================================================================================================
         # Tab2のFrame2の作成
         frame2_tab2 = LabelFrame(master, text='都道府県', background='white')
@@ -222,9 +240,11 @@ class Tab2(ttk.Frame, GuiApplication):
         all_check_button = Button(frame2_tab2, text='全選択', command=select_all_button, overrelief='groove')
         all_check_button.grid(row=rows, column=3)
 
+        # 「全解除」ボタンを設置
         unselect_all_button = functools.partial(self.clear_all_checkeboxes, frame2_tab2, rows, cols)
         all_check_button = Button(frame2_tab2, text='全解除', command=unselect_all_button, overrelief='groove')
         all_check_button.grid(row=rows, column=4)
+
     # ========================================================================================================
         # Tab2のFrame3の作成
         frame3_tab2 = ttk.Frame(master, padding=(0, 15, 0, 25), style='Tab2.TFrame')
@@ -237,8 +257,8 @@ class Tab2(ttk.Frame, GuiApplication):
         # キャンセルボタンの設置
         cancel_button = ttk.Button(frame3_tab2, text=('閉じる'), command=master.quit)
         cancel_button.pack(fill='x', padx=75, side='right')
-    # ========================================================================================================
 
+    # ========================================================================================================
     # チェックボックスを押下したときの関数
     def after_cb(self, frame, row, col, var):
         if (row+col*10) > len(self.TODOUFUKEN):  
@@ -256,7 +276,7 @@ class Tab2(ttk.Frame, GuiApplication):
 
         self.mkdirs_list = [self.TODOUFUKEN[i] for i in range(len(self.TODOUFUKEN)) if self.check_todoufuken[i] == True]
 
-    # 「全選択」ボタンを押下したときの関数
+    # 「全選択」ボタンを押下後の関数
     def check_all_checkeboxes(self, frame, rows, cols):
         self.mkdirs_list = list(copy.copy(self.TODOUFUKEN))
         self.check_todoufuken.clear()
@@ -273,7 +293,7 @@ class Tab2(ttk.Frame, GuiApplication):
                     cb = ttk.Checkbutton(frame, padding=10, text=self.TODOUFUKEN[row+col*10], style='Tab2_ON_Check.TCheckbutton', variable=v, command=f)
                     cb.grid(row=row, column=col)
 
-    # 「全解除」ボタンを押下したときの関数
+    # 「全解除」ボタンを押下後の関数
     def clear_all_checkeboxes(self, frame, rows, cols):
         self.mkdirs_list.clear()
         self.check_todoufuken = [False for fal in range(len(self.TODOUFUKEN))]
@@ -287,11 +307,20 @@ class Tab2(ttk.Frame, GuiApplication):
                     cb = ttk.Checkbutton(frame, padding=10, text=self.TODOUFUKEN[row+col*10], style='Tab2_OFF_Check.TCheckbutton', variable=v, command=f)  
                     cb.grid(row=row, column=col)
 
+
     # タブ2の「作成」ボタンを押したときの処理
     def clicked_mkdir2(self, entry1_tag2):
         dir_path = entry1_tag2.get()
+
+        # ドライブ(例 c:/, D:/)のパスを見つける
+        match_head_path = re.search(r'^[A-Z]:/', dir_path)
+
+        # フォルダを作成する処理
         if not dir_path:
             messagebox.showerror('エラー', 'パスの指定がありません')
+            return
+        elif not match_head_path:
+            messagebox.showerror('エラー', '正しいパスを入力してください!')
             return
         try:
             if not self.mkdirs_list:
@@ -300,11 +329,11 @@ class Tab2(ttk.Frame, GuiApplication):
             else:
                 msg = messagebox.askyesno(
                 '確認', 
-                '作成先のパスはあっていますか?\n' +
-                '--------------------------------\n' +
-                '{}\n'.format(dir_path) + 
-                '--------------------------------\n' +
-                '作成しますがよろしいですか?')
+                '作成先のパスはあっていますか?\n' 
+                + '-------------------------------------------------------------------------------\n' 
+                + '{}\n'.format(dir_path)  
+                + '-------------------------------------------------------------------------------\n' 
+                + '作成しますがよろしいですか?')
                 if msg == True:
                     mkdir_todoufuken(dir_path, self.mkdirs_list)
                     messagebox.showinfo('フォルダ作成情報', 'フォルダが作成されました')
@@ -312,6 +341,10 @@ class Tab2(ttk.Frame, GuiApplication):
 
         except FileExistsError:
             messagebox.showwarning('警告', '既に同じ名前のフォルダが存在します')
+            return
+        except Exception as e:
+            print('エラー', e)
+            messagebox.showerror('エラー', '予期しないエラーが発生しました')
             return
 
 
@@ -322,6 +355,7 @@ if __name__ == "__main__":
     root.title('自動フォルダ作成ツール')
     root.configure(background='white')
 
+    # icon.txtまでのパスを取得
     def resource_path(relative_path):
         if hasattr(sys, '_MEIPASS'):
             return os.path.join(sys._MEIPASS, relative_path)
@@ -337,6 +371,7 @@ if __name__ == "__main__":
     
     app = GuiApplication(master=root)
 
+    # ウィンドウの大きさを変える
     winsize = {
         'フォルダ名(番号付き)': "500x190",
         '都道府県名(番号付き)': "500x580",
@@ -351,7 +386,7 @@ if __name__ == "__main__":
 
     app.mainloop()
 
-# spec
+# specファイルに追加
 # a.datas += [("icon.txt", ".//icon.txt", "DATA")]
 # app = BUNDLE(exe,
 #              name='Main.app',
