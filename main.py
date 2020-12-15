@@ -18,12 +18,15 @@ class GuiApplication(ttk.Notebook):
     def __init__(self, master=None):
         super().__init__(master)
 
-        style = ttk.Style()
-        style.configure('new.TFrame',foreground='black', background='white')
+        # Tabに適用する文字と背景の色の設定
+        tab_style = ttk.Style()
+        tab_style.configure('new.TFrame',foreground='black', background='white')
 
+        # Tabのフレームを作成
         tab1 = ttk.Frame(self.master, style='new.TFrame')
         tab2 = ttk.Frame(self.master, style='new.TFrame')
 
+        # タブタイトル
         self.add(tab1, text='フォルダ名(番号付き)')
         self.add(tab2, text='都道府県名(番号付き)')
 
@@ -36,9 +39,7 @@ class GuiApplication(ttk.Notebook):
     def dirdialog_clicked(self, entry):
         iDir = os.path.abspath(os.path.dirname(sys.argv[0]))
         iDir_path = filedialog.askdirectory(initialdir=iDir)
-        print(iDir_path)
         entry.set(iDir_path)
-
 
 class Tab1(ttk.Frame, GuiApplication):
 
@@ -64,7 +65,6 @@ class Tab1(ttk.Frame, GuiApplication):
         # 「フォルダ参照」ボタンの作成
         dir_button = ttk.Button(frame1_tab1, text='参照', command=lambda :super(Tab1, self).dirdialog_clicked(self.entry1_tag1))
         dir_button.pack(side=LEFT)
-
     # ========================================================================================================
         # Tab1のFrame2の作成
         frame2_tab1 = ttk.Frame(master, padding=10, style='Tab1.TFrame')
@@ -100,36 +100,34 @@ class Tab1(ttk.Frame, GuiApplication):
         self.co = ttk.Combobox(frame2_tab1, state="readonly", values=nums_kind, width=12)
         self.co.set(nums_kind[0])
         self.co.pack(side=LEFT, padx=(2, 10))
-
     # ========================================================================================================
         # Tab1のFrame3の作成
         frame3_tab1 = ttk.Frame(master, padding=10, style='Tab1.TFrame')
         frame3_tab1.grid(row=4, column=1, padx=20, sticky=W)
 
         # 実行ボタンの設置
-        create_dir_button = ttk.Button(frame3_tab1, text='作成', command=self.clicked_mkdir1)
+        create_dir_button = ttk.Button(frame3_tab1, text='作成', command=self.clicked_mkdir)
         create_dir_button.pack(fill='x', padx=70, side='left')
 
         # キャンセルボタンの設置
         cancel_button = ttk.Button(frame3_tab1, text=('閉じる'), command=master.quit)
         cancel_button.pack(fill='x', padx=75, side='right')
-
     # ========================================================================================================
     # タブ1の「作成」ボタン押下時処理
-    def clicked_mkdir1(self):
+    def clicked_mkdir(self):
         dir_path = self.entry1_tag1.get()
         input_dirName = self.entry2_tag1.get()
         input_dirCount = self.entry3_tag1.get()
 
-        # ドライブ(例 c:/, D:/)のパスを見つける
+        # ドライブ(例 C:/, D:/)のパスを見つける
         match_head_path = re.search(r'^[A-Z]:/', dir_path)
 
         # パスの判定処理
         if (dir_path, input_dirName, input_dirCount) == (False, False, False):
-            messagebox.showerror('エラー', '何も入力されていません')
+            messagebox.showerror('エラー', '何も入力されていません。')
             return
         if not dir_path:
-            messagebox.showerror('エラー', 'パスの指定がありません')
+            messagebox.showerror('エラー', 'パスの指定がありません。')
             return
         elif not match_head_path:
             messagebox.showerror('エラー', '正しいパスを入力してください!')
@@ -146,10 +144,10 @@ class Tab1(ttk.Frame, GuiApplication):
                 + '作成しますがよろしいですか?')
             if msg == True:
                 if int(input_dirCount) > 100:
-                    messagebox.showwarning('警告', '最大、100個までのフォルダを作成することが可能です')
+                    messagebox.showwarning('警告', '最大、100個までのフォルダを作成することが可能です。')
                     return
                 if self.co.get() == "SERECT":
-                    messagebox.showwarning('警告', '数字の表記が選択されていません')
+                    messagebox.showwarning('警告', '数字の表記が選択されていません。')
                     return
                 if self.co.get() == "01-xx":
                     mkdir_nums(dir_path, input_dirName, input_dirCount)
@@ -166,11 +164,11 @@ class Tab1(ttk.Frame, GuiApplication):
                 messagebox.showinfo('フォルダ作成情報', '{}個のフォルダが作成されました!'.format(input_dirCount))
                 return
         except ValueError:
-            messagebox.showerror('エラー', '半角英数字で番号を入力してください')
+            messagebox.showerror('エラー', '半角英数字で番号を入力してください。')
             return
         except Exception as e:
             print('エラー :',e)
-            messagebox.showerror('エラー', '予期しないエラーが発生しました')
+            messagebox.showerror('エラー', '予期しないエラーが発生しました。')
             return
 
 
@@ -195,9 +193,8 @@ class Tab2(ttk.Frame, GuiApplication):
 
         style = ttk.Style()
         style.configure('Tab2.TFrame', foreground='black', background='white')
-        style.configure('Tab2_OFF_Check.TCheckbutton', foreground='#000000', background='white')
-        style.configure('Tab2_ON_Check.TCheckbutton', foreground='#0F1FFF', background='white')
-
+        style.configure('OFF_Checkbox.TCheckbutton', foreground='#000000', background='white')
+        style.configure('ON_Checkbox.TCheckbutton', foreground='#0F1FFF', background='white')
     # ========================================================================================================
         # Tab2のFrame1の作成
         frame1_tab2 = ttk.Frame(master, padding=10, relief='groove', style='Tab2.TFrame')
@@ -215,7 +212,6 @@ class Tab2(ttk.Frame, GuiApplication):
         # 「フォルダ参照」ボタンの作成
         dir_button = ttk.Button(frame1_tab2, text='参照', command=lambda :super(Tab2, self).dirdialog_clicked(entry1_tag2))
         dir_button.pack(side=LEFT)
-
     # ========================================================================================================
         # Tab2のFrame2の作成
         frame2_tab2 = LabelFrame(master, text='都道府県', background='white')
@@ -225,15 +221,7 @@ class Tab2(ttk.Frame, GuiApplication):
         # 10 × 5の行列 47個の項目
         cols = 5
         rows = (len(self.TODOUFUKEN) // cols) + 1  # 10
-
-        for row in range(rows):  # 行
-            for col in range(cols):  # 列
-                v = BooleanVar()
-                v.set(False)
-                if (row+col*10) < len(self.TODOUFUKEN):  
-                    f = functools.partial(self.after_cb, frame2_tab2, row, col, v)
-                    cb = ttk.Checkbutton(frame2_tab2, padding=10, text=self.TODOUFUKEN[row+col*10], style='Tab2_OFF_Check.TCheckbutton',variable=v, command=f)  
-                    cb.grid(row=row, column=col)
+        self.place_checkboxes_for_prefectures(rows, cols, frame2_tab2, checkset=False, checkcolor='OFF_Checkbox.TCheckbutton')
 
         # 「全選択」ボタンを設置
         select_all_button = functools.partial(self.check_all_checkeboxes, frame2_tab2, rows, cols)
@@ -244,21 +232,30 @@ class Tab2(ttk.Frame, GuiApplication):
         unselect_all_button = functools.partial(self.clear_all_checkeboxes, frame2_tab2, rows, cols)
         all_check_button = Button(frame2_tab2, text='全解除', command=unselect_all_button, overrelief='groove')
         all_check_button.grid(row=rows, column=4)
-
     # ========================================================================================================
         # Tab2のFrame3の作成
         frame3_tab2 = ttk.Frame(master, padding=(0, 15, 0, 25), style='Tab2.TFrame')
         frame3_tab2.grid(row=4, column=1, padx=30, sticky=W)
 
         # 実行ボタンの設置
-        create_dir_button = ttk.Button(frame3_tab2, text='作成', command=lambda: self.clicked_mkdir2(entry1_tag2))
+        create_dir_button = ttk.Button(frame3_tab2, text='作成', command=lambda: self.clicked_mkdirs_todoufuken(entry1_tag2))
         create_dir_button.pack(fill='x', padx=70, side='left')
 
         # キャンセルボタンの設置
         cancel_button = ttk.Button(frame3_tab2, text=('閉じる'), command=master.quit)
         cancel_button.pack(fill='x', padx=75, side='right')
-
     # ========================================================================================================
+    # 都道府県名のチェックボックスを配置する関数
+    def place_checkboxes_for_prefectures(self, rows, cols, frame, checkset=None, checkcolor=None):
+        for row in range(rows):  # 行
+            for col in range(cols):  # 列
+                v = BooleanVar()
+                v.set(checkset)
+                if (row+col*10) < len(self.TODOUFUKEN):  
+                    f = functools.partial(self.after_cb, frame, row, col, v)
+                    cb = ttk.Checkbutton(frame, padding=10, text=self.TODOUFUKEN[row+col*10], style=checkcolor,variable=v, command=f)  
+                    cb.grid(row=row, column=col)
+
     # チェックボックスを押下したときの関数
     def after_cb(self, frame, row, col, var):
         if (row+col*10) > len(self.TODOUFUKEN):  
@@ -266,12 +263,12 @@ class Tab2(ttk.Frame, GuiApplication):
         elif var.get() == True:
             self.check_todoufuken[row+col*10] = True
             f = functools.partial(self.after_cb, frame, row, col, var)
-            cb = ttk.Checkbutton(frame, padding=10, text='{}'.format(self.TODOUFUKEN[row+col*10]), style='Tab2_ON_Check.TCheckbutton', variable=var, command=f)
+            cb = ttk.Checkbutton(frame, padding=10, text='{}'.format(self.TODOUFUKEN[row+col*10]), style='ON_Checkbox.TCheckbutton', variable=var, command=f)
             cb.grid(row=row, column=col)
         else:
             self.check_todoufuken[row+col*10] = False
             f = functools.partial(self.after_cb, frame, row, col, var)
-            cb = ttk.Checkbutton(frame, padding=10, text='{}'.format(self.TODOUFUKEN[row+col*10]), style='Tab2_OFF_Check.TCheckbutton', variable=var, command=f)
+            cb = ttk.Checkbutton(frame, padding=10, text='{}'.format(self.TODOUFUKEN[row+col*10]), style='OFF_Checkbox.TCheckbutton', variable=var, command=f)
             cb.grid(row=row, column=col)
 
         self.mkdirs_list = [self.TODOUFUKEN[i] for i in range(len(self.TODOUFUKEN)) if self.check_todoufuken[i] == True]
@@ -284,47 +281,32 @@ class Tab2(ttk.Frame, GuiApplication):
         for _ in range(len(self.TODOUFUKEN)):
             self.check_todoufuken.append(True)
 
-        for row in range(rows):
-            for col in range(cols):
-                v = BooleanVar()
-                v.set(True)
-                f = functools.partial(self.after_cb, frame, row, col, v)
-                if (row+col*10) < len(self.TODOUFUKEN):
-                    cb = ttk.Checkbutton(frame, padding=10, text=self.TODOUFUKEN[row+col*10], style='Tab2_ON_Check.TCheckbutton', variable=v, command=f)
-                    cb.grid(row=row, column=col)
+        self.place_checkboxes_for_prefectures(rows, cols, frame, checkset=True, checkcolor='ON_Checkbox.TCheckbutton')
 
     # 「全解除」ボタンを押下後の関数
     def clear_all_checkeboxes(self, frame, rows, cols):
         self.mkdirs_list.clear()
         self.check_todoufuken = [False for fal in range(len(self.TODOUFUKEN))]
 
-        for row in range(rows):  # 行
-            for col in range(cols):  # 列
-                v = BooleanVar()
-                v.set(False)
-                f = functools.partial(self.after_cb, frame, row, col, v)
-                if (row+col*10) < len(self.TODOUFUKEN):
-                    cb = ttk.Checkbutton(frame, padding=10, text=self.TODOUFUKEN[row+col*10], style='Tab2_OFF_Check.TCheckbutton', variable=v, command=f)  
-                    cb.grid(row=row, column=col)
-
+        self.place_checkboxes_for_prefectures(rows, cols, frame, checkset=False, checkcolor='OFF_Checkbox.TCheckbutton')
 
     # タブ2の「作成」ボタンを押したときの処理
-    def clicked_mkdir2(self, entry1_tag2):
+    def clicked_mkdirs_todoufuken(self, entry1_tag2):
         dir_path = entry1_tag2.get()
 
-        # ドライブ(例 c:/, D:/)のパスを見つける
+        # ドライブ(例 C:/, D:/)のパスを見つける
         match_head_path = re.search(r'^[A-Z]:/', dir_path)
 
         # フォルダを作成する処理
         if not dir_path:
-            messagebox.showerror('エラー', 'パスの指定がありません')
+            messagebox.showerror('エラー', 'パスの指定がありません。')
             return
         elif not match_head_path:
             messagebox.showerror('エラー', '正しいパスを入力してください!')
             return
         try:
             if not self.mkdirs_list:
-                messagebox.showerror('エラー', '都道府県名が選択されていません')
+                messagebox.showerror('エラー', '都道府県名が選択されていません。')
                 return
             else:
                 msg = messagebox.askyesno(
@@ -336,24 +318,23 @@ class Tab2(ttk.Frame, GuiApplication):
                 + '作成しますがよろしいですか?')
                 if msg == True:
                     mkdir_todoufuken(dir_path, self.mkdirs_list)
-                    messagebox.showinfo('フォルダ作成情報', 'フォルダが作成されました')
+                    messagebox.showinfo('フォルダ作成情報', 'フォルダが作成されました。')
                     return
-
         except FileExistsError:
-            messagebox.showwarning('警告', '既に同じ名前のフォルダが存在します')
+            messagebox.showwarning('警告', '既に同じ名前のフォルダが存在します。')
             return
         except Exception as e:
             print('エラー', e)
-            messagebox.showerror('エラー', '予期しないエラーが発生しました')
+            messagebox.showerror('エラー', '予期しないエラーが発生しました。')
             return
 
 
 if __name__ == "__main__":
 
-    # rootの作成
-    root = Tk()
-    root.title('自動フォルダ作成ツール')
-    root.configure(background='white')
+    # winの作成
+    win = Tk()
+    win.title('自動フォルダ作成ツール')
+    win.configure(background='white')
 
     # icon.txtまでのパスを取得
     def resource_path(relative_path):
@@ -361,15 +342,22 @@ if __name__ == "__main__":
             return os.path.join(sys._MEIPASS, relative_path)
         return os.path.join(os.path.abspath("."), relative_path)
 
+    # ウィンドウの大きさ変更イベント
+    def changed_tab(event):
+        nb = event.widget
+        text = nb.tab(nb.select(), 'text')
+        if text in winsize:
+            win.geometry(winsize[text])
+
     # アイコンデータを読み込み(Base64)
-    icon_text = resource_path('icon.txt')
+    icon_text = resource_path('icon/icon.txt')
     with open(icon_text, 'r') as f:
         icon_data = f.read()
 
     # アイコンの設置(base64)
-    root.tk.call('wm', 'iconphoto', root._w, PhotoImage(data=icon_data))
+    win.tk.call('wm', 'iconphoto', win._w, PhotoImage(data=icon_data))
     
-    app = GuiApplication(master=root)
+    app = GuiApplication(master=win)
 
     # ウィンドウの大きさを変える
     winsize = {
@@ -377,12 +365,7 @@ if __name__ == "__main__":
         '都道府県名(番号付き)': "500x580",
     }
 
-    def changed(event):
-        nb = event.widget
-        text = nb.tab(nb.select(), 'text')
-        if text in winsize:
-            root.geometry(winsize[text])
-    app.bind('<<NotebookTabChanged>>', changed)
+    app.bind('<<NotebookTabChanged>>', changed_tab)
 
     app.mainloop()
 
