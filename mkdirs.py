@@ -153,8 +153,8 @@ def mkdir_todoufuken(dir_path :str, mkdirs_list :list):
     mkdirs_list : list of str
         作成するフォルダ名のリスト。
     """
-    for idx, todoufuken in enumerate(mkdirs_list):
-        if idx < 9:
-            os.mkdir(dir_path + '/' + '0{}{}'.format(idx+1, todoufuken))
+    for todoufuken_idx, todoufuken in enumerate(mkdirs_list):
+        if todoufuken_idx < 9:
+            os.mkdir(dir_path + '/' + '0{}{}'.format(todoufuken_idx+1, todoufuken))
         else:
-            os.mkdir(dir_path + '/' + '{}{}'.format(idx+1, todoufuken))
+            os.mkdir(dir_path + '/' + '{}{}'.format(todoufuken_idx+1, todoufuken))
