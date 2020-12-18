@@ -129,14 +129,14 @@ class Tab1(ttk.Frame, GuiApplication):
             return
 
         try:
-            msg = messagebox.askyesno(
+            ismessage = messagebox.askyesno(
                 '確認',
                 '作成先のパスはあっていますか?\n'
                 + '-------------------------------------------------------------------------------\n'
                 + '{}\n'.format(dir_path)
                 + '-------------------------------------------------------------------------------\n'
                 + '作成しますがよろしいですか?')
-            if msg == True:
+            if ismessage == True:
                 if int(input_dirCount) > 100:
                     messagebox.showwarning('警告', '最大、100個までのフォルダを作成することが可能です。')
                     return
@@ -303,14 +303,14 @@ class Tab2(ttk.Frame, GuiApplication):
                 messagebox.showerror('エラー', '都道府県名が選択されていません。')
                 return
             else:
-                msg = messagebox.askyesno(
+                ismessage = messagebox.askyesno(
                     '確認',
                     '作成先のパスはあっていますか?\n'
                     + '-------------------------------------------------------------------------------\n'
                     + '{}\n'.format(dir_path)
                     + '-------------------------------------------------------------------------------\n'
                     + '作成しますがよろしいですか?')
-                if msg == True:
+                if ismessage == True:
                     mkdir_todoufuken(dir_path, self.mkdirs_list)
                     messagebox.showinfo('フォルダ作成情報', 'フォルダが作成されました。')
                     return
